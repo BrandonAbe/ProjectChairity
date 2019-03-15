@@ -17,6 +17,14 @@
 #include <Servo.h>
 Servo leftServo;  // create servo object to control a servo
 Servo rightServo;  // create servo object to control a servo
+//Harman Code
+int gyroPin = 11;               //Gyro is connected to analog pin 11 (May not be, unsure if it is referring to SDA pin)
+float gyroVoltage = 5;         //Gyro is running at 5V
+float gyroZeroVoltage = 2.5;   //Gyro is zeroed at 2.5V
+float gyroSensitivity = .007;  //Our example gyro is 7mV/deg/sec-sample rate only, we need the one for our model.
+float rotationThreshold = 1;   //Minimum deg/sec to keep track of - helps with gyro drifting
+float currentAngle = 0;          //Keep track of our current angle
+//Harman code ends
 
 void setup() {
   // initialize the serial port:
@@ -30,14 +38,8 @@ void loop() {
   {
     Serial.println("Button is Pressed");
     Serial.println(sensorValue);
-    leftServo.attach(2,750,2000);  // attaches the left servo on pin 2 to the servo object
-   for (leftPos = 0; leftPos <= 0; leftPos -= 1) { // goes from 0 degrees to 180 degrees
-    leftServo.write(10);        // tell servo to go to move 10°
-    delay(5000);                       // This delay controls the time that the brakes are turned on
-    leftServo.detach();
-    break;
   }
-  }
+  
   
   if (sensorValue <= 600)
   {
@@ -45,4 +47,37 @@ void loop() {
     Serial.println(sensorValue);
     leftServo.detach();
    }
+}
+
+//Need to figure out how to return the current angle value to outside the loop/call this loop as a function somehow
+//The code is really simple, and should be effective for us, if we can figure out how to apply it to our model.
+//Gyro Code
+void loop() {
+  //This line converts the 0-1023 signal to 0-5V
+  float gyroRate = (analogRead(gyroPin) * gyroVoltage) / 1023;
+
+  //This line finds the voltage offset from sitting still
+  gyroRate -= gyroZeroVoltage;
+
+  //This line divides the voltage we found by the gyro's sensitivity
+  gyroRate /= gyroSensitivity;
+
+  //Ignore the gyro if our angular velocity does not meet our threshold
+  if (gyroRate >= rotationThreshold || gyroRate <= -rotationThreshold) {
+    //This line divides the value by 100 since we are running in a 10ms loop (1000ms/10ms)
+    gyroRate /= 100;
+    currentAngle += gyroRate;
+  }
+
+  //Keep our angle between 0-359 degrees
+  if (currentAngle < 0)
+    currentAngle += 360;
+  else if (currentAngle > 359)
+    currentAngle -= 360;
+
+  //DEBUG
+  Serial.println(currentAngle);
+
+  delay(10);
+}
 }
