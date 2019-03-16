@@ -24,6 +24,7 @@ float gyroZeroVoltage = 2.5;   //Gyro is zeroed at 2.5V
 float gyroSensitivity = .007;  //Our example gyro is 7mV/deg/sec-sample rate only, we need the one for our model.
 float rotationThreshold = 1;   //Minimum deg/sec to keep track of - helps with gyro drifting
 float currentAngle = 0;          //Keep track of our current angle
+float currentAngle2 = 0;
 //Harman code ends
 
 void setup() {
@@ -38,6 +39,13 @@ void loop() {
   {
     Serial.println("Button is Pressed");
     Serial.println(sensorValue);
+    //Harman Code
+    currentAngle1 = currentAngle2;//Sets previous angle to angle1 
+    currentAngle2 = int gyro();//finds new angle
+    if (currentAngle2-currentAngle1>5 && currentAngle2 !=0){ //if difference is greater than cutoff, exit the loop (use in actuator loop, not break)  
+      break;                    //If necessary we can call additional times during loop.
+    }
+    
   }
   
   
@@ -49,10 +57,9 @@ void loop() {
    }
 }
 
-//Need to figure out how to return the current angle value to outside the loop/call this loop as a function somehow
-//The code is really simple, and should be effective for us, if we can figure out how to apply it to our model.
+
 //Gyro Code
-void loop() {
+int gyro() {
   //This line converts the 0-1023 signal to 0-5V
   float gyroRate = (analogRead(gyroPin) * gyroVoltage) / 1023;
 
@@ -78,6 +85,5 @@ void loop() {
   //DEBUG
   Serial.println(currentAngle);
 
-  delay(10);
-}
+  return currentAngle;
 }
