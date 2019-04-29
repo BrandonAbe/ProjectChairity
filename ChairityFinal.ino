@@ -116,17 +116,17 @@ void actuateUp(){
     GyZoff = -1*zAvg;
 
     //read gyro data
-    GyX=(Wire.read()<<8|Wire.read()) + GyXoff;
-    GyY=(Wire.read()<<8|Wire.read()) + GyYoff;
-    GyZ=(Wire.read()<<8|Wire.read()) + GyZoff;
+    GyX=(Wire.read()<<8|Wire.read())/100;
+    GyY=(Wire.read()<<8|Wire.read())/100;
+    GyZ=(Wire.read()<<8|Wire.read())/100;
 
     //get pitch/roll
     getAngle(AcX,AcY,AcZ);
 
     //send the data out the serial port
-    Serial.print("Angle (in degrees): ");
-    Serial.print("Pitch = "); Serial.print(pitch);
-    Serial.print(" | Roll = "); Serial.println(roll);
+    //Serial.print("Angle (in degrees): ");
+    //Serial.print("Pitch = "); Serial.print(pitch);
+    //Serial.print(" | Roll = "); Serial.println(roll);
 
 
     Serial.print("Gyroscope: ");
