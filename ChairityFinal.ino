@@ -1,13 +1,10 @@
 /*
- Project Charity
+ A Safe Lift Mechanism For Elderly Assistance
+ Authors: Brandon Rosenblatt, Harman Singh, Israel Helms
  
- Created 03 March 2019
- Rev0 on 03 March 2019
- Rev1 on 05 March 2019
- Rev2 on 09 March 2019 - Left Brake now works
- Rev3 on 26 March 2019 - Both Brakes working
- by Brandon Rosenblatt
- */
+ This program was created to control an Arduino Mega 2560, MPU 6050 Gyroscope,
+ capacitive touch sensor, and a 2-channel relay.
+*/
 
 // Global initializations
 #include <Servo.h>
@@ -15,12 +12,12 @@
 #include <math.h>
 
 //Brake Constants
-Servo leftServo;  // create servo object to control a servo
-Servo rightServo;  // create servo object to control a servo
+Servo leftServo;  // create servo object to control the left servo
+Servo rightServo;  // create servo object to control the right servo
 
 //Relay Constants
-const int leftRelay = 53;
-const int rightRelay = 52;
+const int leftRelay = 53;  // sets control pin for left relay 
+const int rightRelay = 52; // sets control pin for left relay 
 
 //Gyroscope Constants
 const int MPU=0x68;
@@ -31,18 +28,17 @@ double rollAvg = 0.532; //Average across 13 samples
 double xAvg = -3007; double yAvg = -249; double zAvg = -82;
 //Set gyro limits
 double pitchLimit, yawLimit, rollLimit;
-pitchLimit = 0;
-yawLimit = 0;
-rollLimit = 0;
-
+//pitchLimit = 0;
+//yawLimit = 0;
+//rollLimit = 0;
 
 void setup() {
   // initialize the serial port:
   Serial.begin(9600); // Set Baud Rate
 
   //relay Code
-  pinMode(leftRelay, OUTPUT); //forward
-  pinMode(rightRelay, OUTPUT); //backward
+  pinMode(leftRelay, OUTPUT);  // Allow left relay to be an output
+  pinMode(rightRelay, OUTPUT); // Allow right relay to be an output
 
   //Gyro Code
   Wire.begin();
