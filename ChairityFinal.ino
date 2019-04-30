@@ -21,8 +21,9 @@ const int rightRelay = 52; // sets control pin for left relay
 
 //Gyroscope Constants
 const int MPU=0x68;
-int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+int16_t GyX,GyY,GyZ;
 double pitch,roll,yaw; // Double float variables for pitch, roll, and yaw
+
 //Set gyro limits
 double pitchLimit, yawLimit, rollLimit; // Variables for limiting pitch, roll, and yaw
 
@@ -44,9 +45,9 @@ void setup() {
 
 void loop() {
   int sensorValue = analogRead(A0); // default value is 0 on startup
-  if (sensorValue > 600 )
+  if (sensorValue > 600 ) // If touch sensor is touched
   {
-    Serial.println("Button is Pressed");
+    //Serial.println("Button is Pressed"); //Uncomment to display the sensor is touched on serial monitor
     //Serial.println(sensorValue);   // Uncomment to display analog value from touch sensor for debugging purposes. 
     leftServo.attach(2,750,2000);  // attaches the left servo on pin 2 to the servo object
     rightServo.attach(3,750,2000);  // attaches the right servo on pin 3 to the servo object
@@ -64,10 +65,10 @@ void loop() {
   
   if (sensorValue <= 600) // if capacitive sensor is not pressed
   {
-    Serial.println("Button is NOT Pressed");
-    Serial.println(sensorValue);
-    leftServo.detach();
-    rightServo.detach();
+    //Serial.println("Button is NOT Pressed"); //Uncomment to display the sensor is not touched on serial monitor
+    //Serial.println(sensorValue);   // Uncomment to display analog value from touch sensor for debugging purposes. 
+    leftServo.detach();  // Ensures the left servo movement is 0 to prevent braking
+    rightServo.detach(); // Ensures the right servo movement is 0 to prevent braking
    }
 }
 
@@ -82,9 +83,9 @@ void actuateUp(){
     Wire.requestFrom(MPU,14,true);
 
     //read gyro data
-    GyX=(Wire.read()<<8|Wire.read())/100;
-    GyY=(Wire.read()<<8|Wire.read())/100;
-    GyZ=(Wire.read()<<8|Wire.read())/100;
+    GyX=(Wire.read()<<8|Wire.read())/100; //Read X position and filter the input by factor of 100
+    GyY=(Wire.read()<<8|Wire.read())/100; //Read Y position and filter the input by factor of 100
+    GyZ=(Wire.read()<<8|Wire.read())/100; //Read Z position and filter the input by factor of 100
 
     //get pitch/roll
     getAngle(AcX,AcY,AcZ);
@@ -145,18 +146,12 @@ void actuateDown(){
     GyZoff = -1*zAvg;
 
     //read gyro data
-    GyX=(Wire.read()<<8|Wire.read()) + GyXoff;
-    GyY=(Wire.read()<<8|Wire.read()) + GyYoff;
-    GyZ=(Wire.read()<<8|Wire.read()) + GyZoff;
+    GyX=(Wire.read()<<8|Wire.read())/100; //Read X position and filter the input by factor of 100
+    GyY=(Wire.read()<<8|Wire.read())/100; //Read Y position and filter the input by factor of 100
+    GyZ=(Wire.read()<<8|Wire.read())/100; //Read Z position and filter the input by factor of 100
 
     //get pitch/roll
     getAngle(AcX,AcY,AcZ);
-
-    //send the data out the serial port
-    /*Serial.print("Angle (in degrees): ");
-    Serial.print("Pitch = "); Serial.print(pitch);
-    Serial.print(" | Roll = "); Serial.println(roll);
-
 
     Serial.print("Gyroscope: ");
     Serial.print("X = "); Serial.print(GyX);
