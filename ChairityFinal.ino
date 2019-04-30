@@ -138,13 +138,6 @@ void actuateDown(){
     Wire.endTransmission(false);
     Wire.requestFrom(MPU,14,true);
 
-    int GyXoff,GyYoff,GyZoff;
-
-    //Gyro correction
-    GyXoff = -1*xAvg;
-    GyYoff = -1*yAvg;
-    GyZoff = -1*zAvg;
-
     //read gyro data
     GyX=(Wire.read()<<8|Wire.read())/100; //Read X position and filter the input by factor of 100
     GyY=(Wire.read()<<8|Wire.read())/100; //Read Y position and filter the input by factor of 100
@@ -165,12 +158,11 @@ void actuateDown(){
     if (yaw>= yawLimit){
       actuateDown();
       break; 
-    }*/
+    }
     if (pitch<= 0){
       break;
     }
     delay(100);
-
  }
 
   digitalWrite(leftRelay, HIGH);
